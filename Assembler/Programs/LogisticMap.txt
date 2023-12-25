@@ -1,0 +1,48 @@
+#r and x_n are in i/256
+LDA 0r12 0d224  #load r = 0.875 in reg 12
+LDA 0r5 0d128   #load x_n = 0.5 in reg 13
+LDA 0r14 0d5    #loop counter in reg 14
+
+#LOOP:
+STR 0d255 0r5   #store intermediate result into RAM at 0r255
+LDA 0r2 0d0     #load 0 into A
+MOV 0r3 0r5     #load x_n into B
+SUB 0r2 0r2 0r3 #0 minus x_n into A
+LDA 0r9 0d20    #EXITA as return point
+LDA 0r10 0d40
+JMP 0r10        #multiply A and B
+#EXITA:
+MOV 0r2 0r5     #mult result into A
+MOV 0r3 0r12    #r into B
+LDA 0r9 0d30    #EXITB as return point
+LDA 0r10 0d40
+JMP 0r10        #multiply A and B
+#EXITB:
+DEC 0r14 0r14   #decrement loop counter
+LDA 0r10 0d66
+JIZ 0r10        #EXIT program if loop counter is zero
+LDA 0r10 0d6
+JMP 0r10        #LOOP if loop counter is not zero
+
+#MULT:
+LDA 0r4 0d8     #Loop Counter
+LDA 0r5 0d0     #Result
+LDA 0r6 0d128   #Bit mask starting at 10000000
+LDA 0r7 0d50    #MLOOP programm address, needs to be manually set
+LDA 0r8 0d58    #CHECK, needs to be manually set
+
+#MLOOP:
+BSR 0r2 0r2     #shift A right to get the higher 8 bits of 16bit result, for decimal multiplication
+AND 0r0 0r6 0r3 #checks B with bit mask without storing result
+JIZ 0r8         #CHECK if current bit is 0
+ADD 0r5 0r2 0r5 #add to result only if current bit is 1
+
+#CHECK:
+BSR 0r6 0r6     #move bit mask right
+DEC 0r4 0r4     #decrement counter
+JIZ 0r9         #return if loop counter is zero
+JMP 0r7         #MLOOP
+
+#EXIT:
+MOV 0r10 0r5    #store mult result in reg 10
+STR 0d255 0r10  #store result into RAM at 0r255
