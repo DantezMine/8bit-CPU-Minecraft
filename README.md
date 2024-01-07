@@ -1,8 +1,8 @@
 ADDING THE WORLD TO MINECRAFT:
-1. Locate your Minecraft directory
-    Windows: Search for "%APPDATA%\.minecraft" in the search bar
-    macOS: Search for "~/Library/Application Support/minecraft"
-    Linux: "~/.minecraft" where "~" refers to the home directory
+1. Locate your Minecraft directory<br />
+    Windows: Search for "%APPDATA%\.minecraft" in the search bar<br />
+    macOS: Search for "\~/Library/Application Support/minecraft"<br />
+    Linux: "\~/.minecraft" where "\~" refers to the home directory<br />
     More information can be found on the Minecraft Wiki: https://minecraft.wiki/w/.minecraft
 2. Locate the "saves" folder
 3. Download the world file, ending in ".rar"
@@ -10,7 +10,7 @@ ADDING THE WORLD TO MINECRAFT:
 5. The world should now appear in your Singleplayer worlds list
 
 
-USING THE ASSEMBLER:
+USING THE ASSEMBLER:<br />
 Note: The current version is not very user-friendly and requires editing the code to change the file name
 1. Verify that the assembly code is in the folder called "Programs" in the same directory as the "assembler.py" file
 2. Open the "assembler.py" file in any text editor
@@ -19,10 +19,10 @@ Note: The current version is not very user-friendly and requires editing the cod
 5. The binary file should appear in the same "Programs" folder with the ".bin" suffix
 
 
-LOADING A PROGRAM INTO MEMORY FROM A BINARY FILE:
-Note: The current version is not very user-friendly and requires editing the code to change the file name
-Note: This program requires the python module "mcschematic" and python version 3.9.7, any other versions may not work
-Note: To use the generated schematics, the mod "Litematica" (Video Guide: https://www.youtube.com/watch?v=KFzyNtyN8qI) is required
+LOADING A PROGRAM INTO MEMORY FROM A BINARY FILE:<br />
+Note: The current version is not very user-friendly and requires editing the code to change the file name<br />
+Note: This program requires the python module "mcschematic" and python version 3.9.7, any other versions may not work<br />
+Note: To use the generated schematics, the mod "Litematica" (Video Guide: https://www.youtube.com/watch?v=KFzyNtyN8qI) is required<br />
 1. Verify that the binary file is in the folder called "Programs" in the same directory as the "assembler.py" file
 2. Open the "BinarySchem.py" file in any text editor
 3. Locate the variable "title" and change its value to the name of the target file, without the suffix ".bin"
@@ -36,12 +36,12 @@ Note: To use the generated schematics, the mod "Litematica" (Video Guide: https:
 11. Add a power source (typically a redstone block or a lever) behind the comparator on the gray concrete floor
 12. If using the "carpet" mod, feel free to set the tick rate to 200 (usually the highest it will actually run at) with "/tick rate 200"
 13. Wait for the redstone lamps at the output of the disc reader to stop changing and all be off
-14. The byte at location zero, i.e. 0b0 will be overridden to a value of zero and must be manually entered
+14. The byte at location zero, i.e. 0b0 will be overridden to a value of zero and must be manually entered<br />
     The value can be located in the ".bin" file as the third byte (two groups of four) in the first row
 15. Run the program from the control panel
 
 
-USING THE CONTROL PANEL:
+USING THE CONTROL PANEL:<br />
 Note: Each interface part is given in order from left to right
 1. The Output lamps on the left side display the output. When I/O is toggled off, it will show the data of where the program counter is pointing to, else it shows the output at the address of the address byte.
 2. The I/O switch controls whether the data and address set on the right panel are fed into RAM.
@@ -53,9 +53,9 @@ Note: Each interface part is given in order from left to right
 8. The Input lamps set the input at the address pointed to by the Address lamps.
 
 
-INSTRUCTION SET:
-Note: A, B and X are assumed to be registers, while I is an immediate formed by A and B, where B is the higher and A the lower valued half of the byte
-Note: The Flags column indicates whether the flags register is updated during the operation.
+INSTRUCTION SET:<br />
+Note: A, B and X are assumed to be registers, while I is an immediate formed by A and B, where B is the higher and A the lower valued half of the byte<br />
+Note: The Flags column indicates whether the flags register is updated during the operation.<br />
 Note: A must always be an even numbered register, while B must always be odd numbered.
 
     Instr. Result A   B      Flags  Opcode  Description
@@ -76,11 +76,11 @@ Note: A must always be an even numbered register, while B must always be odd num
     JIZ           A   or B   no     1111    Jumps to instruction at A or B if zero flag
 
 
-ENCODING AN INSTRUCTION:
-Note: Instructions are always built up of two bytes. The first, lower byte includes A and the Opcode in that order, and the second, higher byte includes B and the Result.
-Note: When inputting the instruction, the first byte is always in an even numbered address and the second byte right after it.
-Note: The registers addresses from 1 to 14.
-Some examples:
-    ADD 0r2 0r2 0r3 encodes as 0010 0100 for the first byte and 0011 0010 for the second byte
-    LDA 0r2 0d154 encodes as 1010 0001 for the first byte and 1001 0010 for the second byte
+ENCODING AN INSTRUCTION:<br />
+Note: Instructions are always built up of two bytes. The first, lower byte includes A and the Opcode in that order, and the second, higher byte includes B and the Result.<br />
+Note: When inputting the instruction, the first byte is always in an even numbered address and the second byte right after it.<br />
+Note: The registers addresses from 1 to 14.<br />
+Some examples:<br />
+    ADD 0r2 0r2 0r3 encodes as 0010 0100 for the first byte and 0011 0010 for the second byte<br />
+    LDA 0r2 0d154 encodes as 1010 0001 for the first byte and 1001 0010 for the second byte<br />
     JMP 0r5 encodes as 0000 1101 for the first byte and 0101 0000 for the second byte
