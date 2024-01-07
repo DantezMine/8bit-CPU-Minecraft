@@ -1,0 +1,8 @@
+#Chest containing nothing
+minecraft:chest
+
+#Chest containing a single stick in the first slot of the chest
+minecraft:chest{Items:[Slot:0,Count:1,id:"minecraft:stick"]}
+
+#Chest containing a shulker box containing a stick in its first slot
+minecraft:chest{Items:[Slot:0,Count:1,id:"minecraft:shulker_box",tag:{BlockEntityTag:{Items:[Slot:0,Count:1,id:"minecraft:stick"],id:"minecraft:shulker_box"}}]}

@@ -1,0 +1,116 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{none/global//global/global}
+  \entry{BenEater}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 31.12.2023)}
+    \field{title}{Ben Eater - About}
+    \verb{url}
+    \verb https://eater.net/about
+    \endverb
+  \endentry
+
+  \entry{InstrTable_Agner}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 27.12.2023)}
+    \field{title}{Instruction Tables - Agner}
+    \verb{url}
+    \verb https://www.agner.org/optimize/instruction_tables.pdf
+    \endverb
+  \endentry
+
+  \entry{RCC_Wiki}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 06.11.2023)}
+    \field{title}{4-bit Ripple Carry Adder}
+    \verb{url}
+    \verb https://en.m.wikipedia.org/wiki/File:4-bit_ripple_carry_adder.svg
+    \endverb
+  \endentry
+
+  \entry{CCA_OpenRedstone}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 0.7.11.2023)}
+    \field{title}{The CCA - Carry-Cancel Adder}
+    \verb{url}
+    \verb https://forum.openredstone.org/thread-5493.html
+    \endverb
+  \endentry
+
+  \entry{danger_sign}{book}{}
+    \name{author}{1}{}{%
+      {{hash=YNPSJP}{%
+         family={Yale N.\bibnamedelima Patt},
+         familyi={Y\bibinitperiod\bibinitdelim N\bibinitperiod\bibinitdelim P\bibinitperiod},
+         given={Sanjay J.\bibnamedelima Patel},
+         giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {McGrawHill}%
+    }
+    \strng{namehash}{YNPSJP1}
+    \strng{fullhash}{YNPSJP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{edition}{Third}
+    \field{title}{introduction to computing systems}
+    \field{year}{2019}
+  \endentry
+
+  \entry{Computer_Architecture}{book}{}
+    \name{author}{1}{}{%
+      {{hash=JLHDAP}{%
+         family={John L.\bibnamedelima Hennessy},
+         familyi={J\bibinitperiod\bibinitdelim L\bibinitperiod\bibinitdelim H\bibinitperiod},
+         given={David A.\bibnamedelima Patterson},
+         giveni={D\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Morgan Kaufman, Elsevier Inc.}%
+    }
+    \strng{namehash}{JLHDAP1}
+    \strng{fullhash}{JLHDAP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{edition}{Sixth}
+    \field{title}{Computer Architecture, A Quantitative Approach}
+    \field{year}{2019}
+  \endentry
+
+  \entry{FibonacciSpiral}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 26.12.2023)}
+    \field{title}{Coding Adventure: Boids}
+    \verb{url}
+    \verb https://www.youtube.com/watch?v=bqtqltqcQhw
+    \endverb
+  \endentry
+
+  \entry{LogMap_Wiki}{online}{}
+    \field{labeltitlesource}{title}
+    \field{addendum}{(accessed: 27.12.2023)}
+    \field{title}{Logistic Map}
+    \verb{url}
+    \verb https://en.wikipedia.org/wiki/Logistic_map
+    \endverb
+  \endentry
+\enddatalist
+\endinput

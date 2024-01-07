@@ -1,0 +1,24 @@
+LDA 0r2 0d5     #Value of A in reg 2
+LDA 0r3 0d31    #Value of B in reg 3
+LDA 0r4 0d8     #Loop Counter
+LDA 0r5 0d0     #Result
+LDA 0r6 0d128   #Bit mask 1000000
+LDA 0r7 0d16    #LOOP programm address, needs to be manually set
+LDA 0r8 0d26    #LOOP LOGIC, needs to be manually set
+LDA 0r9 0d34    #EXIT, needs to be manually set
+
+#LOOP
+STR 0d255 0r5   #saves intermediate result to RAM
+BSL 0r5 0r5     #doubles result to account for looping
+AND 0r0 0r6 0r3 #checks B with bit mask without storing result
+JIZ 0r8         #LOOP LOGIC if current bit is 0
+ADD 0r5 0r2 0r5 #add to result only if current bit is 1
+
+#LOOP LOGIC
+BSR 0r6 0r6     #move bit mask right
+DEC 0r4 0r4     #decrement counter
+JIZ 0r9         #exit condition
+JMP 0r7         #LOOP
+
+#EXIT
+STR 0d255 0r5   #store result to RAM

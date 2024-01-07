@@ -1,0 +1,24 @@
+#instr contains the tokens of the current line being parsed
+
+ALUMap = {"ADD":'0100',"SUB":'0101',"AND":'1000',"ORA":'1001'}
+
+def ALUFunc(R,A,B):
+    #string formatting to get the binary representation of decimal
+    #and string slicing to isolate the last four bits
+    #other instructions that use immediates instead of registers
+    #will also slice to isolate the first four bits
+    R = f'{int(instr[1].str[2:]):08b}'[4:8]
+    A, B = '0000', '0000'
+    if IsEven(int(instr[2].str[2:])):
+        A = f'{int(instr[2].str[2:]):08b}'[4:8]
+    if not IsEven(int(instr[3].str[2:])):
+        B = f'{int(instr[3].str[2:]):08b}'[4:8]
+    return (R, A, B)
+
+if instr[0].str in ALUMap:
+    INSTR = ALUMap[instr[0].str]
+    R, A, B = ALUFunc(R, A, B)
+
+#ADDR is calculated for each line at the beginning of the iteration
+#writes the current line to the output file
+programBIN.write("%s %s %s %s %s\n" %(ADDR,A,INSTR,B,R))

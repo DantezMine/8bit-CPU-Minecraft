@@ -1,0 +1,63 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Abstract}{iii}{section*.2}%
+\contentsline {chapter}{Acknowledgements}{v}{section*.3}%
+\contentsline {chapter}{Foreword}{ix}{chapter*.5}%
+\contentsline {chapter}{\numberline {1}Building Blocks of Logic}{1}{chapter.6}%
+\contentsline {section}{\numberline {1.1}Classic Electrical Circuits}{1}{section.7}%
+\contentsline {subsection}{\numberline {1.1.1}Signal Transmission}{1}{subsection.8}%
+\contentsline {subsection}{\numberline {1.1.2}Clock and Instruction Cycles}{1}{subsection.9}%
+\contentsline {section}{\numberline {1.2}Minecraft Circuits}{2}{section.10}%
+\contentsline {subsection}{\numberline {1.2.1}Redstone Fundamentals}{2}{subsection.11}%
+\contentsline {subsection}{\numberline {1.2.2}The Components}{2}{subsection.13}%
+\contentsline {subsection}{\numberline {1.2.3}Example Circuits}{3}{subsection.14}%
+\contentsline {chapter}{\numberline {2}Design}{5}{chapter.16}%
+\contentsline {section}{\numberline {2.1}Layout and Architecture}{6}{section.18}%
+\contentsline {subsection}{\numberline {2.1.1}Overview}{6}{subsection.19}%
+\contentsline {subsection}{\numberline {2.1.2}Architecture}{6}{subsection.20}%
+\contentsline {section}{\numberline {2.2}Components}{7}{section.21}%
+\contentsline {subsection}{\numberline {2.2.1}Arithmetic Logic Unit}{7}{subsection.22}%
+\contentsline {subsubsection}{Binary Addition}{7}{section*.23}%
+\contentsline {subsubsection}{Adder Designs}{7}{section*.26}%
+\contentsline {subsubsection}{Two's Complement}{10}{section*.31}%
+\contentsline {subsection}{\numberline {2.2.2}Instruction Unit}{10}{subsection.33}%
+\contentsline {subsubsection}{The Decoder}{10}{section*.34}%
+\contentsline {subsubsection}{Control Bits}{11}{section*.35}%
+\contentsline {subsection}{\numberline {2.2.3}Read Write Addressable Memory}{11}{subsection.36}%
+\contentsline {subsection}{\numberline {2.2.4}Program Counter}{12}{subsection.38}%
+\contentsline {subsubsection}{Branching}{13}{section*.40}%
+\contentsline {section}{\numberline {2.3}Timing}{13}{section.41}%
+\contentsline {subsection}{\numberline {2.3.1}The Danger Sign Problem}{13}{subsection.42}%
+\contentsline {subsubsection}{The Flip Flop}{14}{section*.45}%
+\contentsline {subsubsection}{Short Pulse Write}{16}{section*.47}%
+\contentsline {subsection}{\numberline {2.3.2}Program Counter Difficulties}{16}{subsection.48}%
+\contentsline {section}{\numberline {2.4}Instruction Set}{17}{section.49}%
+\contentsline {subsection}{\numberline {2.4.1}Instruction Set Architecture}{18}{subsection.51}%
+\contentsline {subsection}{\numberline {2.4.2}Addressing Modes}{18}{subsection.53}%
+\contentsline {subsection}{\numberline {2.4.3}Encoding the Instruction Set}{20}{subsection.55}%
+\contentsline {section}{\numberline {2.5}User Interface}{20}{section.57}%
+\contentsline {subsection}{\numberline {2.5.1}Control Panel}{21}{subsection.58}%
+\contentsline {subsection}{\numberline {2.5.2}Disc Reader}{21}{subsection.60}%
+\contentsline {subsection}{\numberline {2.5.3}Assembler}{22}{subsection.62}%
+\contentsline {subsection}{\numberline {2.5.4}Binary File to Minecraft}{23}{subsection.89}%
+\contentsline {chapter}{\numberline {3}Results}{25}{chapter.100}%
+\contentsline {section}{\numberline {3.1}Programs}{25}{section.101}%
+\contentsline {subsection}{\numberline {3.1.1}Fibonacci}{25}{subsection.102}%
+\contentsline {subsection}{\numberline {3.1.2}8-bit Multiplication}{26}{subsection.104}%
+\contentsline {subsection}{\numberline {3.1.3}Logistic Map}{27}{subsection.107}%
+\contentsline {section}{\numberline {3.2}Specifications}{28}{section.110}%
+\contentsline {section}{\numberline {3.3}Limitations and Improvements}{28}{section.112}%
+\contentsline {subsection}{\numberline {3.3.1}The Instruction Design}{28}{subsection.113}%
+\contentsline {subsection}{\numberline {3.3.2}Hard-coded Pointer}{29}{subsection.115}%
+\contentsline {subsection}{\numberline {3.3.3}Stack}{30}{subsection.116}%
+\contentsline {subsection}{\numberline {3.3.4}Complexity}{30}{subsection.117}%
+\contentsline {chapter}{\numberline {4}Appendix}{31}{chapter.118}%
+\contentsline {section}{\numberline {4.1}Resources}{31}{section.119}%
+\contentsline {subsection}{\numberline {4.1.1}8bit-CPU-Minecraft Repository}{31}{subsection.120}%
+\contentsline {section}{\numberline {4.2}Code}{31}{section.121}%
+\contentsline {subsection}{\numberline {4.2.1}Assembler}{31}{subsection.122}%
+\contentsline {subsection}{\numberline {4.2.2}Binary To Schematic}{33}{subsection.243}%
+\contentsline {section}{\numberline {4.3}Programs}{34}{section.305}%
+\contentsline {subsection}{\numberline {4.3.1}Fibonacci}{34}{subsection.306}%
+\contentsline {subsection}{\numberline {4.3.2}Multiplication}{35}{subsection.320}%
+\contentsline {subsection}{\numberline {4.3.3}Logistic Map}{35}{subsection.346}%
+\contentsline {chapter}{Eigenständigkeitserklärung}{43}{section*.399}%

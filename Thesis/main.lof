@@ -1,0 +1,31 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Five basic components}}{3}{figure.caption.12}%
+\contentsline {figure}{\numberline {1.2}{\ignorespaces AND-Gate, XOR-Gate, Pulse-Width Limiter}}{4}{figure.caption.15}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Placeholder overview of the CPU}}{5}{figure.caption.17}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Addition by hand}}{7}{figure.caption.24}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces One-bit full adder in a diagram and in Minecraft}}{8}{figure.caption.27}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Ripple-Carry Adder}}{9}{figure.caption.28}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Carry pattern addition}}{9}{figure.caption.29}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Carry Cancel Adder}}{9}{figure.caption.30}%
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Two's complement example}}{10}{figure.caption.32}%
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Register Module}}{11}{figure.caption.37}%
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Program Counter}}{12}{figure.caption.39}%
+\contentsline {figure}{\numberline {2.10}{\ignorespaces Sequential Logic Circuit}}{14}{figure.caption.43}%
+\contentsline {figure}{\numberline {2.11}{\ignorespaces Gated D Latches and flip-flops}}{15}{figure.caption.44}%
+\contentsline {figure}{\numberline {2.12}{\ignorespaces Master-Slave flip-flop}}{15}{figure.caption.46}%
+\contentsline {figure}{\numberline {2.13}{\ignorespaces Instruction Set Architecture Classes}}{19}{figure.caption.52}%
+\contentsline {figure}{\numberline {2.14}{\ignorespaces Instruction Encoding}}{20}{figure.caption.56}%
+\contentsline {figure}{\numberline {2.15}{\ignorespaces Control Panel}}{21}{figure.caption.59}%
+\contentsline {figure}{\numberline {2.16}{\ignorespaces Disc Reader}}{22}{figure.caption.61}%
+\contentsline {figure}{\numberline {2.17}{\ignorespaces Parser code snippet}}{23}{figure.caption.63}%
+\contentsline {figure}{\numberline {2.18}{\ignorespaces Block IDs for containers}}{24}{figure.caption.90}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Fibonacci program diagram}}{25}{figure.caption.103}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Multiplication by hand}}{26}{figure.caption.105}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Multiplication program diagram}}{26}{figure.caption.106}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Logistic Map program diagram}}{27}{figure.caption.108}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Instruction Design Comparison}}{29}{figure.caption.114}%
+\addvspace {10\p@ }

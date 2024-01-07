@@ -1,0 +1,191 @@
+\chapter{Results}
+
+\label{Chapter3}
+
+\section{Programs}
+
+\subsection{Fibonacci}
+The Fibonacci series is presumably the most famous sequence of numbers in the world, at least by name. It contains many wonderful properties within itself that reveal themselves under certain circumstances. My personal favorite has to do with phyllotaxis, which is the regular arrangement of leaves or seeds in plants, famously the sunflower seeds in the dark center of the flower, where the Fibonacci numbers are related to the outward arcs that the seeds form when the golden ratio defines the turn fraction between each outward growing seed in the spiral. The concept is best shown in a video by Sebastian Lague: \textit{Coding Adventure: Boids} \cite[Timestamp: 03:03-06:12]{FibonacciSpiral}. The Fibonacci sequence can be expressed through the following formula:
+    \[x_0 = 0,\space x_1 = 1\]
+    \[x_n = x_{n-1} + x_{n-2} \qquad n \in \mathbb{N} \; [2,\infty[\]
+The diagram in Figure \ref{fig::FibonacciDiagram} gives an overview of the function of the program in Appendix \ref{app::Fibonacci}. The final output of the program was 144, corresponding to the 13th value in the Fibonacci sequence (assuming it starts at 0, 1).
+
+\begin{figure}[h!]
+    \begin{center}
+        {\small \begin{tikzpicture}
+            \node[startstop] (start) {Start};
+            \node[process] (load) [below=of start] {0 into A, 1 into B};
+            \node[process] (add)  [right=1.5cm of load] {Add B to A};
+            \node[process] (swap) [right=1.5cm of add] {Swap A and B};
+            \node[decision] (comp) [below=of swap] {Is B less than 100 ?};
+            \node[process] (str)  [left=1.5cm of comp] {Store A and B in RAM};
+            \node[startstop] (stop) [left=of str] {Stop};
+            
+            \draw[->, thick] (start.south) -- (load.north);
+            \draw[->, thick] (load.east) -- (add.west);
+            \draw[->, thick] (add.east) -- (swap.west);
+            \draw[->, thick] (swap.south) -- (comp.north);
+            \draw[->, thick] (comp.west) -- (add.south)  node [midway,sloped, above] {true};
+            \draw[->, thick] (comp.west) -- (str.east)  node [midway, below] {false};
+            \draw[->, thick] (str.west) -- (stop.east);
+        \end{tikzpicture}}
+    \end{center}
+    \caption[Fibonacci program diagram]{Program diagram for the Fibonacci sequence that exits once the value is bigger than 100}
+    \label{fig::FibonacciDiagram}
+\end{figure}
+
+\subsection{8-bit Multiplication} \label{ssec::Multiplication}
+Multiplication is a necessity for very many calculations, and is, especially for integers, just a series of additions, which this CPU can handle easily. In binary, multiplication by hand is easier than in decimal, since, for each digit, there are only two possible scenarios: Either the digit is 1, and an addition is performed, or it's 0 and that digit is skipped. Each digit, the summand or the sum needs to be shifted to adjust for the digit value. Figure \ref{fig::MultInBin} illustrates the idea of bit shifting the summand each digit. The procedure shown in the diagram in Figure \ref{fig::MultiplicationDiagram} only outputs correct results for integers whose product is less than 255. The procedure can be modified slightly by shifting the summand right instead of the result left each time to instead multiply two fixed-point decimals represented as $\frac{i}{256}$, i.e. the byte is read out as if divided by 256 while stored as an integer $i$, as is done in section \ref{ssec:LogisticMap}, but is only as accurate as can fit into the eight bits. The non-modified program worked perfectly, outputting the exact value through each test within the limitations. The functionality of the modified version is demonstrated in the next section.
+
+\begin{figure}[h]
+    \begin{center}
+        \begin{tabular}{ccccc}
+            00001011 & $\cdot$ & 00000101 & = & 00000000 \\
+            & & & + & 00000000\\
+            & & & + & 00000000\\
+            & & & + & 00101000\\
+            & & & + & 00000000\\
+            & & & + & 00001010\\
+            & & & + & 00000101\\
+            \hline
+            & & & = & 00110111
+        \end{tabular}
+    \end{center}
+    \caption[Multiplication by hand]{Multiplication in binary by hand, performed from left to right: 11 $\cdot$ 5 = 55}
+    \label{fig::MultInBin}
+\end{figure}
+
+\begin{figure}[h]
+    \begin{center}
+        {\small \begin{tikzpicture}
+            \node[startstop] (start) {Start};
+            \node[process]  (load) [below=of start] {Load A and B};
+            \node[process]  (bsl)  [right=of load ] {Bit shift result left};
+            \node[decision] (mask) [right=of bsl  ] {Is current digit of B one ?};
+            \node[process]  (add)  [below=of mask ] {Add A to result};
+            \node[decision]  (loop) [left=of add  ] {All bits checked?};
+            \node[process]  (str)  [left=of loop  ] {Store result in RAM};
+            \node[startstop](stop) [below=of str  ] {Stop};
+
+            \draw[->, thick] (start.south) -- (load.north);
+            \draw[->, thick] (load.east) -- (bsl.west);
+            \draw[->, thick] (bsl.east) -- (mask.west);
+            \draw[->, thick] (mask.south) -- (add.north) node [midway, right] {True};
+            \draw[->, thick] (mask.south) -- (loop.east) node [midway, sloped, above] {False};
+            \draw[->, thick] (add.west) -- (loop.east);
+            \draw[->, thick] (loop.west) -- (str.east) node [midway, above] {True};
+            \draw[->, thick] (loop.north) -- (bsl.south) node [midway, right] {False};
+            \draw[->, thick] (str.south) -- (stop.north);
+        \end{tikzpicture}}
+    \end{center}
+    \caption[Multiplication program diagram]{Program Diagram for the multiplication procedure}
+    \label{fig::MultiplicationDiagram}
+\end{figure}
+
+\subsection{Logistic Map} \label{ssec:LogisticMap}
+The Logistic Map \cite{LogMap_Wiki} is an example of how a very simple, iterative equation can display chaotic behavior from small changes in its initial starting condition. It was originally popularized by the biologist Robert May in a paper in 1976 as a model for population behavior. The equation is written
+\[x_n = r \cdot x_{n-1} (1-x_{n-1})\]
+In the demographic model as per May, $x_n$ represents the ratio between current population to the maximum possible population, while the constant r dictates the general behavior of the population. For values of r between 0 and 1, the population eventually dies, i.e. $x_n$ goes to zero. With r between 1 and 3, $x_n$ approaches a value of $\frac{r-1}{r}$, where, based on the initial population, it may fluctuate around for some time. Beyond 3, the behavior of the population starts to become less predictable and more and more chaotic, the most chaotic behavior happens between values of 3.5 and 3.9. Beyond a value of 4, for most initial values the population will diverge and escape the realm of [0,1]. The Wikipedia page on the subject offers its insights into the subject and the meaning of the chaos. Important for this project is demonstrating that the CPU can process and evaluate the equation, as well as iterate through it a number of times. Figure \ref{fig::LogisticMapDiagram} shows the process for computing the polynomial N times. The multiplication function is modified to multiply two numbers between 0 and 1 in fixed-point binary, where a number is represented as $\frac{i}{256}$, where $i$ is an 8-bit unsigned integer. The number 0.875, for example, looks like
+\[0.875 = 11100000 = 2^{-1} + 2^{-2} + 2^{-3} = 1 * (0.5) + 1 * (0.25) + 1 * (0.125)\]
+The $(1-x_{n-1})$ operation is simplified to $0-x_{n-1}$, since both the summand and the sum are between 0 and 1 and thus the digit in front of the period can be ignored.
+
+\begin{figure}[h]
+    \begin{center}
+        {\small \begin{tikzpicture}
+            \node[startstop] (start) {Start};
+            \node[process]  (load)  [left=of start ] {Load r and $x_0$};
+            \node[process]  (ldB)   [below=of load ] {$x_n$ into B};
+            \node[process]  (sub)   [right=of ldB  ] {0 minus $x_n$ into A};
+            \node[function] (mult1) [right=of sub  ] {Multiply A by B};
+            \node[process]  (ldR)   [below=of mult1] {r into B};
+            \node[function] (mult2) [left=of ldR   ] {Multiply A by B};
+            \node[decision] (loop)  [below=0.7cm of ldB ] {N iterations?};
+            \node[process]  (str)   [below=of loop ] {Store A in RAM};
+            \node[startstop](stop)  [right=of str  ] {Stop};
+
+            \draw[->, thick] (start.west) -- (load.east);
+            \draw[->, thick] (load.south) -- (ldB.north);
+            \draw[->, thick] (ldB.east) -- (sub.west);
+            \draw[->, thick] (sub.east) -- (mult1.west);
+            \draw[->, thick] (mult1.south) -- (ldR.north);
+            \draw[->, thick] (ldR.west) -- (mult2.east);
+            \draw[->, thick] (mult2.west) -- (loop.east);
+            \draw[->, thick] (loop.north) -- (ldB.south) node [midway,right] {False};
+            \draw[->, thick] (loop.south) -- (str.north) node [midway,right] {True};
+            \draw[->, thick] (str.east) -- (stop.west);
+        \end{tikzpicture}}
+    \end{center}
+    \caption[Logistic Map program diagram]{Program Diagram for $x_n = r \cdot x_{n-1} (1-x_{n-1})$}
+    \label{fig::LogisticMapDiagram}
+\end{figure}
+
+The way that a decimal is represented limits its use to values between 0 and 1 which means that, in the simulation of the model, the population will always eventually die. To test the program, two different initial conditions with $r = 0.875$ were chosen and each was iterated 5 times. Figure \ref{tab::LogMapResults} shows $x_n$ at each iteration in both binary and decimal representation, as well as the actual value in decimal. Already after 3 iterations the error has risen above 10\% in both cases, and after 5 iterations above 35\%, which is an unfortunate limitation when using only 8 bits. Nevertheless, the results show that the program does work as intended and can evaluate the Logistic Map expression.
+
+\begin{table}[h]
+    \caption[Logistic Map program output]{Output and relative error per iteration, along with the exact values from a calculator. Base of the number is indicated by subtext. r = 0.875 and initial conditions of 0.5 and 0.25}
+    \label{tab::LogMapResults}
+    \begin{center}
+        \begin{tabular}{lllll}
+            N & Result$_2$ & Result$_{10}$ & Exact$_{10}$ & Relative Error\\\hline
+            0 & 10000000 & 0.5 & 0.5 & 0\%\\\hline
+            1 & 00101011 & 0.21875 & 0.21875 & 0\%\\\hline
+            2 & 00111000 & 0.140625 & 0.149536 & 5.959\%\\\hline
+            3 & 00011001 & 0.097656 & 0.111278 & 12.24\%\\\hline
+            4 & 00010001 & 0.066406 & 0.086533 & 23.26\%\\\hline
+            5 & 00001011 & 0.042969 & 0.069165 & 37.87\%\\\hline\\
+        \end{tabular}
+        \begin{tabular}{lllll}
+            N & Result$_2$ & Result$_{10}$ & Exact$_{10}$ & Relative Error\\\hline
+            0 & 01000000 & 0.25 & 0.25 & 0\%\\\hline
+            1 & 00101010 & 0.164062 & 0.164062 & 0\%\\\hline
+            2 & 00011100 & 0.109375 & 0.120000 & 8.856\%\\\hline
+            3 & 00010101 & 0.082031 & 0.092401 & 11.22\%\\\hline
+            4 & 00001110 & 0.054687 & 0.073380 & 25.47\%\\\hline
+            5 & 00001000 & 0.03125 & 0.059496 & 47.48\%\\\hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\section{Specifications}
+\begin{table}[h!]
+    \caption{Specifications of the CPU}
+    \label{tab::specs}
+    \begin{center}
+        \begin{tabular}{l @{\quad} l}
+            Clock & 0.16Hz or 6.2s per Cycle \\
+            Storage & 256 bytes \\
+            Architecture & 8-bit \\
+            Registers & 14 General Purpose Registers \\
+            Instruction Set & See Table \ref{tab::InstructionSet} \\
+            I/O Ports & One input, one output \\
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\section{Limitations and Improvements} 
+
+\subsection{The Instruction Design} \label{ssec::InstructionLayout}
+The current instruction encoding comes from an earlier prototype of the CPU and is quite outdated. As a reminder, an instruction is built up in 2 bytes, from the most significant bit to the least, as follows: four bits for the A register, 4 bits for the instruction code, four bits for the B register and four bits for the result register, where A and B can be combined to make up an immediate, an 8-bit integer encoded in the instruction. In the earlier prototype, this was done only to make wiring from the Instruction Register to the Registers easier. Since it was a very simplified setup and the programs were both tiny and programmed by placing blocks to represent the ON bits. Unfortunately, this design is very hard to read or program by hand in machine code, since A is in a different byte than B, making immediates unwieldy, and the result is in a different byte than the instruction code, making it hard to quickly parse. This does not translate directly from Assembly code to machine code and requires the reader to perform mental gymnastics jumping around within the line to parse the instruction. An improved version would arrange the four segments into their proper order: Instruction, Result, A and B. The comparison between the two design variations can be seen in Figure \ref{fig::InstrDesignComp}, where the instruction \textbf{LDA 0r3 0d100} is written out in machine code. Where beforehand an immediate was formed by A being the minor and B the major part, the roles are now reversed. This reads exactly like the assembly code and is a lot faster to parse and understand each instruction. If one would never need to interact with the binary machine code and use only assembly or a higher level language, which is possible with the completed CPU, then this problem would have no meaning to the user. However, to debug the design and function of the CPU this instruction encoding is, without understating it, a nightmare to work with.
+An additional feature of this improved design is the way a program could modify itself or write its own program, since the values are in more sensible locations. A use case for this is storing variables by editing immediates to be used in the program as an argument, like a register pointer. To do this with the current design means having to be aware of the entire instruction that is meant to be modified, and then performing some bit manipulations to assemble the instruction.
+
+\begin{figure}[ht]
+    \begin{center}
+        \begin{tabular}{c@{\,}cc@{\,}c|c@{\,}cc@{\,}c}
+            $\overbrace{0100}^{A}$ & $\overbrace{0001}^{Instr}$ & $\overbrace{0110}^{B}$ & $\overbrace{0011}^{Res}$ & $\overbrace{0001}^{Instr}$ & $\overbrace{0011}^{Res}$ & $\overbrace{0110}^{A}$ & $\overbrace{0100}^{B}$ \\
+            \textbf{4} & \textbf{LDA} & \textbf{96} & \textbf{3} & \textbf{LDA} & \textbf{3} & \multicolumn{2}{c}{\textbf{100}}
+        \end{tabular}
+    \end{center}
+    \caption[Instruction Design Comparison]{Comparison between current design (left) and improved design (right)}
+    \label{fig::InstrDesignComp}
+\end{figure}
+
+\subsection{Hard-coded Pointer}
+Pointers are a big deal for programmers and software engineers that work with some lower level, more classic languages like C or C++. In Assembly, they are potentially even more important, although they are used in quite a different way. To store a value from a register into memory, the location for the variable to be stored is hard-coded into the instruction itself. If that value needs to be changed during runtime, e.g. to write values into sequential memory slots like in a list or a stack, then the actual instruction would need to be changed for the new values. A simple fix would be to have a register dedicated to acting as a pointer to write into memory. The memory module would then accept only this register as its input address during runtime. To modify the write location only this register would need to be modified, which is done the same as setting the value for any other register. Another use case would be to have a mostly-software data reader interacting with an I/O port rather than having a machine that externally controls the writing of data.
+
+\subsection{Stack}
+An important feature, if one is used to writing in assembly, that is missing, is the stack. With the aforementioned improvements, namely the hard-coded pointer, this could be solved programmatically already, but it does add a not insignificant amount of instructions to each push and pop operation. Therefore, a built-in stack module would be an improvement to the CPU, as long as it does not significantly impact the already long clock cycle. This could be achieved in a very similar way the program counter was implemented and adding push and pop operations to the instruction set, which would automatically increment or decrement the stack pointer. The stack has an incredible amount of uses, probably the biggest of which is in function calls, where e.g. the return address or arguments would be pushed to the stack and then retrieved when needed. Additionally, this would decrease the need for more than a few registers, since variables could be pushed and popped from the stack, as it is commonly done in Assembly.
+
+\subsection{Complexity}
+The layout of the CPU is far from optimal and leaves a lot of room for improvements. Most importantly, the wiring needs to be cleaned up and smoothed out, because especially the gap between the RAM and the CPU is incredibly messy. Many wires need to switch levels, some going on the upper level and others going on the lower level, all while crossing each other in numerous instances. A few iterations on the layout and wiring itself could probably drastically reduce the messiness and make the wiring look more appealing to the eye.
+
+Furthermore, the implementation of the clock is unnecessarily complicated and involves a series of uncomfortable workarounds to function properly. It makes abundant use of Minecrafts timing functionality to reach a certain component at a very specific time, rather than being solved logically and, very importantly, more reliably. For example, the flags register gets updated by the ALU after it completed its operation. In order to store the flags, a pulse from the clock is required, which, to compensate for the time the ALU takes to calculate, is delayed significantly. A solution would be to use a flip-flop, as it was suggested in the Danger Sign Problem (See section \ref{ssec:DangerSign}) and simply write to the flags register at the next clock pulse.

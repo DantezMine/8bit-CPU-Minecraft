@@ -1,0 +1,331 @@
+\chapter{Design}
+
+\label{Chapter2}
+
+\begin{figure}[!h]
+    \begin{center}
+        \includegraphics[width=0.49\textwidth]{Figures/Layout_1.png}
+        \includegraphics[width=0.49\textwidth]{Figures/CPU-Full-small.png}
+        \includegraphics[width=0.8\textwidth]{Figures/CPU-Core-small.png}
+        \caption{Placeholder overview of the CPU}
+        \label{fig::Overview}
+    \end{center}
+\end{figure}
+
+\section{Layout and Architecture}
+\subsection{Overview}
+Figure \ref{fig::Overview} shows three versions of a top-down look on the CPU. The first image is a simplified overview, showing each component in roughly the correct position and scale as well as each line connecting the components, and serves as a reference for exploring the CPU. The image on the right is a top-down render of the entire CPU and its memory to be compared side by side with the simplified overview. The last image shows the CPU without its memory to allow for a better view on the other components which are relative to the memory module much smaller. Each component is highlighted according to the legend next to the image.
+
+\subsection{Architecture} \label{ssec::Architecture}
+In chip design, there are two separate architecture principles which dictate the interaction between the CPU and memory. This interaction is often the biggest bottleneck when it comes to how fast the CPU can execute a function. One look at the layout of any CPU and its memory (Figure \ref{fig::Overview} gives an overview over the CPU of this project) will make it clear why this is the case: The memory modules are much larger than the CPU and, while not necessarily very complex, require the CPU to wait for the signal to travel to the furthest memory unit and back to be sure the data has arrived. Even in real chips, where signals propagate at very fast speeds, this is a significant amount of downtime for the CPU. The two architectures tackle the problem in two different ways. The classic and most famous Von Neumann architecture considers all memory to be in the same pool. This means that all memory shares the same address space and is built up the same way, i.e. has the same address and storage size (e.g. 4-bit address and 8-bit storage). Both program data, like variables, and instruction data, like the instruction codes and the arguments, live in the same memory and are accessed over the same data bus. The second option is Harvard architecture, which strictly separates the two pools of memory. All the program data lives in the standard memory space, in RAM, while the instruction data lives in its own space, like a ROM drive or a separate RAM module. The address busses are held separate as well, which allows both the address and the size of the data to be different in each pool. For example, the program data could run on an 8-bit address and use 8-bit data, while the instruction data can have 12bit address space and use 16-bit instructions. Separating the address busses means the CPU can read the instruction and write to memory in the same clock cycle.
+
+Most modern machines will not follow the strict design principles laid out by the two architectures. The line separating instruction and program data is usually blurred in various ways. This is the concept behind modified Harvard architecture. The CPU in this project uses a fairly unique approach to this architecture. It is designed with the Von Neumann architecture at its core, where all program and instruction data shares the same space of memory. There are, however, two separate bus lines, one for the input and one for the output. This allows for similar functionality to the Harvard architecture, where an instruction can be read from and new data written to memory at the same time. The usual advantage of a Harvard architecture based machine being able to have theoretically arbitrarily sized memory units, i.e. each memory unit can have for example an 8-bit or a 24-bit value, independent of what the rest of the computer works on, is mostly lost. This CPU works with instructions of 16-bit lengths, or two memory units, which cannot be accessed at the same time. Therefore, the execution of an instruction happens in two stages. In the first stage, the first byte of the instruction is fetched and stored in the instruction register. In the second stage, the second part of the instruction is output from RAM and is, together with the stored first half, executed. The separate input and output busses as well as the instruction register allow for each instruction to be executed in a single clock cycle, albeit with additional complexity.
+
+\section{Components}
+
+\subsection{Arithmetic Logic Unit}
+\subsubsection{Binary Addition}
+The ALU is the central part for the purpose of a computer. As the name suggests, the computer's purpose is to compute. Data can be moved and ordered around from one place to another, but without the logical operations and manipulation of data there is no function to the CPU, as none of the data will change, react to or interact with other data. The functions of the ALU are by design very simple, but when combined in bigger sequences allow for highly complex calculations. The functions are addition, subtraction, incrementing, decrementing, binary AND, OR and NOT as well as bit-shift-left and bit-shift-right. The most important functions of the ALU are addition and subtraction. The remaining functions are trivial to implement, requiring one or two logic gates each at most.
+
+\begin{figure}[!h]
+    \begin{center}
+        \begin{tabular}{@{\qquad} c @{\qquad}| @{\qquad} c@ {\qquad}}
+            Base-10  & Base-2 \\
+            \hline
+            \begin{tabular}{ccc}
+                & \tiny{1} & \\
+                & 1 & 3 \\
+                + &  & 9 \\
+                \hline
+                & 2 & 2 \\
+            \end{tabular}
+            & \begin{tabular}{cccccc}
+                & & \tiny{1} & & & \tiny{1} \\
+                & 0 & 1 & 1 & 0 & 1 \\
+                + & 0 & 1 & 0 & 0 & 1 \\
+                \hline
+                & 1 & 0 & 1 & 1 & 0\\
+            \end{tabular} \\
+        \end{tabular}
+    \end{center}
+    \caption{Addition by hand}
+    \label{fig::BaseAdditionComparison}
+\end{figure}
+
+Addition in a base-2 system, as is the case in binary, works nearly identically to addition in our familiar base-10 system. Starting from the right, the top and bottom digits are added together and the result written to the answer on the same digit. If the result goes over the highest value of a digit, then the next column gets the extra digit carried over. In the normal case of addition, the carry has a value of one and gets added to the other digits in the column (See Figure \ref{fig::BaseAdditionComparison} for an example). To solve the problem of adding multiple-bit numbers, it helps to reduce the problem to adding only two one-bit numbers, in addition to the carry bit. Binary addition simplifies this problem a lot, since each of the three bits can only be in one of two states: 1 or 0. A truth table gives an overview of the expected outcomes when adding a single digit, or two input bits plus the carry bit, as seen in Table \ref{tab::TruthTableOneBitAdder}.
+\begin{table}
+    \caption{Truth table for single digit addition}
+    \label{tab::TruthTableOneBitAdder}
+    \begin{center}
+            \begin{tabular}{|c|c|c||c|c|}
+                \hline C$_{\text{In}}$ & A & B & C$_{\text{Out}}$ & Sum\\ \hline
+            0 & 0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 & 1 \\
+            0 & 1 & 0 & 0 & 1 \\
+            0 & 1 & 1 & 1 & 0 \\
+            1 & 0 & 0 & 0 & 1 \\
+            1 & 0 & 1 & 1 & 0 \\
+            1 & 1 & 0 & 1 & 0 \\
+            1 & 1 & 1 & 1 & 1 \\\hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\subsubsection{Adder Designs}
+
+In classic circuit design, a series of XOR, AND and OR gates is used in a configuration as in Figure \ref{fig::FullAdder}. This circuit fulfills the aforementioned truth table. The output of the sum is then hooked up to the final output and the Carry$_{\text{Out}}$-bit feeds directly into the Carry$_{\text{In}}$ of the next segment, as in Figure \ref{fig::RippleCarryAdder}. This sort of arrangement is known as a ripple-carry adder. The name stems from the fact that the carry bits ripple through from the right to the left side. If every single digit outputs a carry bit, then the carry bit propagates from the right all the way to the left. Since the highest bit does not know if it needs to consider the carry bit, it needs to wait until every previous adder has finished processing its inputs before it can output its sum with confidence that it's correct. The amount of time for the addition to converge to the final answer grows linearly with each additional bit. On modern CPUs that work with 64-bit numbers, this time is not insignificant, but manageable. Alternatives exist that speed up the output, such as carry-skip adders, but the gains are not as significant as the following solution.
+
+\begin{figure}[!h]
+    \begin{center}
+        \includegraphics[width=0.48\textwidth]{Figures/FullAdder.png}
+        \includegraphics[width=0.45\textwidth]{Figures/FullAdderMC-small.png}
+        \caption{One-bit full adder in a diagram and in Minecraft}
+        \label{fig::FullAdder}
+    \end{center}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{Figures/RippleCarryAdderWikipedia.png}
+        \caption[Ripple-Carry Adder]{Four-bit ripple-carry adder, Source: \cite{RCC_Wiki}}
+        \label{fig::RippleCarryAdder}
+    \end{center}
+\end{figure}
+
+In Minecraft, the time for a single adder to compute its result is around 5RT and each additional carry bit that needs to be processed adds at least 3RT to this time. For a simple 8-bit adder this means a waiting time of 26RT, or 1.3s, until the sum can be read out. This is very inefficient for this project and requires a better alternative. Minecraft's redstone offers a very convenient and simple solution. To improve the speed of the addition, as well as synchronize the outputs, each full adder needs to know beforehand whether it will receive a carry bit or not. Take Figure \ref{fig::AdditionExampleCCA}, where 77 and 75 are added in binary. Notice that the carry operation starts from the first bit, where both bits are 1, all the way to the fourth bit, only stopping when both bits are 0, effectively being cancelled. The only time a carry bit gets generated initially is when both bits are 1, and the only time the carry chain gets stopped is when both bits are 0. This observation is key to optimizing and predicting whether each adder needs an additional carry bit or not. Figure \ref{fig::CCA} shows two layers of the new adder concept, the design of which was mainly taken from the user \textit{Magic} on the \textit{openredstone forums} \cite{CCA_OpenRedstone}. To generate the carry signal (green area with slab ladder), an inverted XOR gate  is used, where it generates a signal when both bits are on or off, and to cancel the carry (red area with slab ladder) a NOR gate is used, only outputting 1 when neither bit is on. The reason why the generate signal is allowed to generate even when both bits are off is because that condition automatically cancels the carry, which takes precedence over the generate signal. These signals are transported up the adder chain, decaying with each block they travel, and then compared at each digit. The stronger signal, i.e. the signal that covers less distance from the right/below takes over, decides whether to add the carry or not. As in Figure \ref{fig::AdditionExampleCCA}, the generate signal at the fifth digit has already lost 4 digits of strength, whereas the cancel signal is newly generated, and will be higher all the way through to the left until a new carry signal is generated. This method works especially well in Minecraft, since the signal strength comparison is an integral part of one of its components, the comparator. A similar implementation in circuit design would probably not grant any benefits, since there is no way to quickly and synchronously compare which signal is stronger or was generated closer.
+
+\begin{figure}[!h]
+    \begin{center}
+        \begin{tabular}{ccccccccc}
+            & \tiny{1} & & & \tiny{1} & \tiny{1} & \tiny{1} & \tiny{1} & \\
+            & 0 & 1 & 0 & 0 & 1 & 1 & 0 & 1 \\
+            + & 0 & 1 & 0 & 0 & 1 & 0 & 1 & 1 \\
+            \hline
+            & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 0\\
+        \end{tabular}
+    \end{center}
+    \caption[Carry pattern addition]{Binary Addition showing carry pattern}
+    \label{fig::AdditionExampleCCA}
+\end{figure}
+
+\begin{figure}[!h]
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{Figures/CCA.png}
+        \caption[Carry Cancel Adder]{Two layers of the Carry Cancel Adder}
+        \label{fig::CCA}
+    \end{center}
+\end{figure}
+
+\subsubsection{Two's Complement}
+
+Currently, the ALU only works with unsigned 8-bit integers, allowing the use of values from 0 to 255. In order to use negative integers, a system to represent negative numbers is needed. The first idea that pops into anyone's mind is to assign the highest bit to the sign bit and say that, if it's 1, the number is negative, and if it's zero, it's positive. Performing simple operations such as binary addition of two numbers now becomes anything but trivial, and would require checks to see if the number is negative before each operation as well as an entirely different truth table to handle the negative numbers, since the corresponding negative analog to the truth table from Table \ref{tab::TruthTableOneBitAdder} would look different. The common standard to use is the so-called \emph{Two's Complement}. This standard assigns the highest bit its own value but with its sign flipped. A 4-bit number in this system would therefore be represented as in Figure \ref{fig::TwosComplement}. To negate a number, all bits are flipped and a one is added. For example, $7 = 0111$ and $-7 = 1001$. Two's complement builds purely on addition, rather than non-linear functions such as the first idea, and only changes the way the number is interpreted, i.e. read by the user. All operations performed on unsigned integers work identically to those from signed integers. The range of an 8-bit signed integer goes from -128 up to and including 127, as can be used in this CPU.
+
+\begin{figure}[!h]
+    \begin{center}
+        $\begin{tabular}{c|c|c|c}
+            \textbf{-8} & \textbf{4} & \textbf{2} & \textbf{1} \\
+            \hline
+            1 & 0 & 1 & 1\\
+        \end{tabular} = 1 * (\textbf{-8}) + 0 * \textbf{4} + 1 * \textbf{2} + 1 * \textbf{1} = -5$
+    \end{center}
+    \caption[Two's complement example]{Two's complement example of (-5)}
+    \label{fig::TwosComplement}
+\end{figure}
+
+\subsection{Instruction Unit}
+The Instruction Unit's function is the least complex of all the components, its design being identical to a multiplexer, yet its role is as vital as any, as it controls the flow of data through the computer. It takes in a 4-bit instruction code, commonly called the opcode, which gets decoded into a series of control bits, whose purpose is to allow data through specific channels to execute an instruction.
+
+\subsubsection{The Decoder}
+The decoder gets its input from the Instruction Register (IR), which always stores the first 8 bytes of the instruction on the first part, the falling edge, of the clock cycle. The IR feeds the opcode, a 4-bit value, into the decoder, which the decoder then uses to turn on or off individual control bits that are connected to each component. Decoding the four bits happens separately in each decoding unit, which are each set to an opcode between 0 and 15. A decoding unit is a NOR gate with four inputs, where each input needs to be off to have an output. Each bit has a preset expected state, where an expected state of 1 gets inverted, so that that input is off when its bit is on, and an expected state of 0 goes through directly, so when that bit is off, that input is also off. If each bit corresponds to its expected state, all the OFF-bits will continue to be off and all the ON-bits will be inverted into an off state, resulting in the output line being off (see Figure \ref{fig::MemUnit}). The output line can now be used to turn on whichever control bits it requires to be turned on by sending the redstone signal through to the control bit. In the component, the control bits that are meant to be on for each opcode have a red block on their corresponding line to allow the signal to pass through them.
+
+\subsubsection{Control Bits}
+The Instruction Unit controls the four main channels of the CPU. The STR control bit enables the output of the Registers and sets the write-line of the RAM high, so that, when the clock goes high, the data is written into RAM. That control bit is only used by one instruction but is necessary for the CPU to write program data, like variables, into memory. The IMM and IN control bits control the inputs to the Registers. The IMM bit specifies that the input to the Registers is an immediate from the instruction data, an 8-bit integer from RAM rather than an output from the ALU. The IN bit is used to tell the Registers to store the available data once the clock goes high. The next three bits labeled PC 1 through 3 send an instruction code to the program counter, where it's processed further to determine whether a jump or a simple increment should occur. Finally, the ALU control bits send another instruction code to the ALU, where the instruction decodes again into a single ALU operation.
+
+\subsection{Read Write Addressable Memory}
+While executing a program, the CPU needs to keep track of various variables as well as modifying or computing new values. The Random Access Memory (RAM) and the Registers are used to store and output data on command. The RAM unit is a big array of registers that each have an 8-bit address and 8 bits of data. The Registers module in the CPU consists of 14 read-write registers that are connected directly to the ALU and the PC. They play the middleman in any operation of the CPU. Any time an instruction is executed, at least one register is specified which contains a value for the execution of the instruction. The jump instruction, for example, takes a register address as an argument to which to set the program counter to: JMP 0r3 sets the program counter to the value of whatever is in register at address 3.
+
+\begin{figure}[bp!]
+    \includegraphics[width=0.48\textwidth]{Figures/MemUnit-small.png}
+    \includegraphics[width=0.48\textwidth]{Figures/MemUnit_1-small.png}
+    \caption[Register Module]{Register with an address of 2, or 0b00000010 (displayed in the graphic). The decoder on the left, the memory unit on the right}
+    \label{fig::MemUnit}
+\end{figure}
+
+The Register is built up of a decoding unit and a memory unit. Figure \ref{fig::MemUnit} displays the decoder on the left, set up for address 2, and the memory unit that sits above it on the right. The decoder is the same as the one from the Instruction Decoder, where each register gets an address. In the case of the RAM, the address is incrementally set from 0 to 255, using up the full range of eight bits, whereas the registers only go from address 1 to 14. The memory unit uses lockable repeaters to store data. By quickly unlocking and re-locking a repeater, the repeater gets set to the state of the redstone behind it from the data line. This sequence starts as soon as the decoding unit receives the correct address. The clock, along with the control bits from the instruction decoder, controls when the address is allowed to go to the decoding units and the subsequent writing of data.
+
+\subsection{Program Counter}
+The purpose of the program counter (PC) is keeping track of what line of the program the CPU is currently executing. In essence, it is a pointer to the RAM module as the read address and is the only way for data to be read from RAM. The PC counts up each clock cycle to the next instruction, which is typically two bytes further than the current instruction. Each instruction is two bytes long and thus is stored in two separate registers in RAM. After the first byte of the instruction has been fetched and stored on the falling edge of the clock, the PC will always increment once to fetch the second half of the instruction. On the rising edge of the clock, the program counter's next action depends on the instruction, which can either increment the PC or give it a jump command, referred to as a branch in the program.
+
+\begin{figure}[bp!]
+    \begin{center}
+        \includegraphics[width=0.55\textwidth]{Figures/FlagsPC_1-small.png}
+        \includegraphics[width=0.35\textwidth]{Figures/FlagsPC-small.png}
+        \caption[Program Counter]{The full program counter on the left and an overview of the controller on the right}
+        \label{fig::FlagsPC}
+    \end{center}
+\end{figure}
+Two separate modules make up the program counter. The main module is a simple 8-bit synchronized addition module. The output of the counter feeds back into itself in order to store its current state without the need of further registers. This is visible in Figure \ref{fig::FlagsPC} on the left image as the lines in front that create a loop in the blue module. This setup makes incrementing the counter by one a straightforward process by setting the carry bit in the lowest addition unit to 1. To set the state of the PC to any arbitrary 8-bit value, the loop is temporarily interrupted to reset the PC while at the same time the new value is given as an input. It is important to note that the carry bit, or any incoming data to the PC, must be a short pulse of exactly 5RT. Otherwise, the program counter will start oscillating its bits on and off due to the nature of the loop. The second module is the controller and takes in both the flags from the ALU and the 3-bit instruction code from the Instruction Decoder. It utilizes a decoder where the instruction is matched with the required flag states to give an output. This decoding unit can be seen on the right side of Figure \ref{fig::FlagsPC}, where the instruction code is input in the bottom in pink, while the flag states are input in the middle in purple. Each conditional jump instruction only considers the flags that are important to it, while the others aren't connected to its decoding unit. The output for each instruction can either tell the PC to increment or to jump to a given address by setting control bits that get sent to the PC. For example, a JIN (jump if negative) instruction would be received from the Instruction Decoder as some combination of a 3-bit number. This matches two decoding units, one of which requires the negative flag to be on, the other requires it to be off. When the shortened clock pulse arrives, the controller either gives an increment signal, i.e. enabling the carry bit, when the condition is not met or a jump command by disabling the loop and feeding in the new address. Finally, the clock segment on the right is used to give a short 5RT pulse on both the falling and the rising edge of the clock signal in order to perform both PC operations in the execution of an instruction.
+
+\subsubsection{Branching}
+A jump is the equivalent to a branch in a program, like an If-statement, where the program continues on a different line. This is achieved by setting the value of the PC to the desired position in the program. A function call, for example, will always include an unconditional jump to the beginning of the function. The return statement at the end of the function then unconditionally jumps back to where the function was called. If-statements, in this CPU, make use of one of two conditional jump instructions: jump if negative (JIN) or jump if zero (JIZ). The JIZ instruction specifically is used most often in loops, where each iteration the loop counter, the value that keeps track of the number of times the loop is being executed starting at the desired loop length, is decremented by one and the state written to the flags register by the ALU. If the loop counter has reached zero, the JIZ instruction exits the loop to a specified line in the program. The example programs that were run as a demonstration of this CPU, particularly the multiplication in section \ref{ssec::Multiplication}, show this concept of looping a set number of times.
+
+\section{Timing}
+
+\subsection{The Danger Sign Problem} \label{ssec:DangerSign}
+The following problem was taken from the book \emph{introduction to computing systems} \cite[Chapter 3.6.6]{danger_sign}.
+The danger sign displays an arrow using lights separated into three parts that are controlled individually to indicate a turn to the right. The goal is to have the lights turn on sequentially to the right, i.e. the arrow starts off dark, then the first section (lights 1 and 2) turns on, then the second section (lights 3 and 4) turns on and then the third (light 5), at which point all lights turn back off again. Each step in this process should happen in 1 second intervals. The lamp therefore has four states represented in simple binary as A(00), B(01), C(10) and D(11).
+\begin{figure}[ht]
+    \begin{center}\includegraphics[scale=0.6]{Figures/DangerSignLogicCircuit.png}\end{center}
+    \caption[Sequential Logic Circuit]{Sequential Logic Circuit, Source: \cite[Chapter 3.6.6]{danger_sign}}
+    \label{fig::DangerSignSequential}
+\end{figure}
+\newline
+Figure \ref{fig::DangerSignSequential} shows the layout of the internals of the controller for the lights. Storage element 1 stores the low bit and storage element 2 stores the high bit. The combinational logic circuit 1 determines which of the lights should be active based on the state of the storage elements. State C(10) for example turns on lights 1 through 4. The combinational logic circuit 2 determines the next state based on the current state, iterating through all states in order. The clock controls the timing of the transition between two states in the storage unit. The choice of what type of storage element to use is critical, as will be apparent later. Starting with \emph{gated D latches} is a good bet, since they are relatively simple in design. If the clock is high, the state of the latch is set to whatever its input state is. If the clock goes low, the latch keeps its current state as is. Additionally, the latch always outputs its current state. The storage elements output their data, the combinational logic controls the lights and outputs the next state back to the storage elements, which, when the clock is high, store that data.
+\newline
+This approach, however, presents a problem. The time that the output from storage takes to go through the combinational logic and return to storage is significantly shorter than a single clock cycle. Since the clock will still be high when the next state arrives at storage, the gated D latches will receive and store the new data and send their new state to the combinational logic circuits once again. What this means is that the state of the system iterates many times in a single clock cycle and the lights flicker indistinguishably through all possible combinations of A through D, as demonstrated in Figure \ref{fig::TrafficLightClock}. The lights would lose their purpose of showing people the way.
+\newline
+\begin{figure}[ht]
+    \begin{center}\includegraphics[scale=0.8]{Figures/TrafficLightClock.png}\end{center}
+    \caption[Gated D Latches and flip-flops]{Comparing gated D latches and flip-flops}
+    \label{fig::TrafficLightClock}
+\end{figure}
+
+\subsubsection{The Flip Flop}
+\begin{figure}[bp!]
+    \begin{center}\includegraphics[scale=0.5]{Figures/MasterSlaveFlipFlop.png}\end{center}
+    \caption[Master-Slave flip-flop]{A master-slave flip-flop, Source: \cite[Chapter 3.6.6]{danger_sign}}
+    \label{fig::MasterSlaveFlipFlop}
+\end{figure}
+Using a \emph{flip-flop} instead of the gated D latch solves the problem. A flip-flop is a sequential logic circuit which is designed change its state only on the rising or falling edge of the clock cycle, i.e. when the clock transitions from high/low to low/high. This is achieved by setting up two gated D latches in series, where the first one is called the master latch and the second one the slave latch. The slave latch is set up identically to the previous design, so when the clock is high, it changes its state to the data it receives. This data comes directly from the master latch, which is set up inversely to the slave, only changing state when the clock is low. The output of both latches is still continuous. When the clock is low, the master latch stores the next state of the system as computed by the conditional logic circuit 2, but the slave latch, which stores the current state, doesn't change its state to the next state. Only when the clock goes high does the slave latch change its state and stores the next state. This time the master latch doesn't process the next state and so the slave will not change its state any further. In each clock cycle the system's state will only increment once.
+
+\subsubsection{Short Pulse Write}
+The problem of data being written too quickly is not uncommon and actually posed some significant problems during the development phase of this project. Minecraft provides the player with more possibilities for such issues. For example, a fix that should only be used in smaller circuits is to extend the time that the signal takes to make it back to the gated D latch by introducing some repeaters. The benefits of this method are a more efficient usage of space and easily modifiable delay timings. The reason this shouldn't be used for larger circuits is that slowing down any transmission of data often limits the speed of the entire circuit. Another problem in larger circuits is that storage units will often not receive their data from one source alone, but from many sources which all have take different amounts of time to process data and for that data to arrive at the storage units, making it very hard to time everything correctly. It is the easiest solution to come up with and to implement in a small circuit, but probably the worst option to choose for the aforementioned reasons. A common approach used in this project is to shorten the length of the incoming pulse to be only as long as the storage element requires to write the data. This can be achieved by using a pulse-width limiter as described in section \ref{ssec::Components}, where a comparator and a repeater set to the required delay generate the necessary pulse length once the clock signal goes high. As long as the data from every possible source arrives at the storage units before the clock goes high, the correct data will be written at the time the clock goes high. Using this method, by the time the combinational logic sends the next state to the storage elements, they will no longer write any further data for the remainder of that clock cycle.
+The solution presented in the danger sign problem also applies to Minecraft, and is a very elegant solution, though, when scaled up, uses space significantly less efficiently than the shorter pulse, because each bit to be stored would require two gated D latches instead of a single pulse-width limiter for the entire storage array.
+
+\subsection{Program Counter Difficulties}
+The nature of the program counter using a comparatively slow loop brings forth a set of requirements to not fall into a state of oscillation. The loop consists of the addition module and the lines that loop back to the input to store the current state. As soon as data gets to the PC, the signal propagates through the module and takes about 5-6RT to reach the input again and settle into a stable state. The problem arises when the length of the signal is either too short or too long. When the signal is too short the data doesn't make it through the module in time to reach the beginning again before the signal turns off. What this means is that part of the module is in the previous state while the rest is in the new state. This arrangement of states then loops around in a circle. This primarily happens when the program counter controller, which matches the instruction with the required flags and controls the input to the PC, has the wrong pulse-width limiter settings or when the incoming data, either the new address or the instruction code, arrives too late and is subsequently cut off too early. The signal being too long is only a problem for the carry bit and happens when the pulse-width limiter is set up incorrectly. The carry bit is unique in the way that it only affects the lowest bit and not itself. When the lowest bit and the carry bit are on, the lowest bit carries the bit up to the next layer and turns off, at which point the carry bit, which in this situation is still on, turns on the lowest bit once again. This results in a continuous counter while the carry bit is on. Either the PC starts oscillating or ends up in a wrong state. This situation is very similar to that of Section \ref{ssec:DangerSign} and could have been solved in the same way, but since it is a major change to the implementation of the PC, it was deemed not important enough. In hindsight, using flip-flops to store the state of the program counter would have been a better solution, since it eliminates most timing issues.
+
+All the different possible interactions between components means the time it takes for a signal to arrive can differ by a significant amount, which means the clock signal needs to change only once the slowest signal that can arrive has arrived. Additionally, the faster signals need to stick around long enough for the clock signal to change, or else the PC fails again. A lot of time went into getting the balance of signals right, and every time something went wrong, chances were it was the program counter that failed.
+
+\section{Instruction Set}
+The list of instructions, the instruction set, is the function that connects the user to the machine. Through the instructions, the programmer can tell the machine what to do and is the key to the potential of the computer. Creating the instruction set is likely the most important and impactful part of designing a CPU, at least in the eyes of the user. There are many options of instructions and designs that need decisions to be made, and all with their advantages and disadvantages, so that there is no objectively perfect design for all computers. The instruction set used in this CPU, as in Table \ref{tab::InstructionSet}, was designed with the help of the book \textit{Computer Architecture}, \textit{A Quantitative Approach} \cite[Appendix A]{Computer_Architecture}, though the ideas presented in the book were not followed strictly and adapted to what seemed a better or easier implementation. The choices made for this CPU are sometimes also remnants from a previously built prototype and include some flaws that could have been avoided if more thought and time had been put into them. Nevertheless, the instruction set allows for theoretically any program to be implemented, though the CPU is limited to its 8-bit range.
+
+\begin{table}[ht]{\small
+    \caption[Full Instruction Set]{\textbf{Full Instruction set.} A, B and X are assumed to be registers, while I is an immediate formed by A and B, where B is the higher and A the lower valued half of the byte. The Flags column indicates wether the flags register is updated during the operation. Additionally, A must always be an even numbered register, while B must always be odd numbered}
+    \label{tab::InstructionSet}
+    \begin{tabular}{|l|c|c|r|c|c|l|}\hline
+        Instr. & Result & A & B & Flags & Opcode & Description\\ \hline \hline
+        LDA & X & I &      & no  & 0001 & Loads I into Register X\\ \hline
+        STR & X & I &      & no  & 0010 & Stores Register X into Address I\\ \hline
+        MOV & X & A & or B & no  & 0011 & Moves Register A/B into X\\ \hline
+        ADD & X & A & B    & yes & 0100 & Adds A and B into X\\ \hline
+        SUB & X & A & B    & yes & 0101 & Subtracts B from A into X\\ \hline
+        INC & X & A & or B & yes & 0110 & Increments A/B into X\\ \hline
+        DEC & X & A & or B & yes & 0111 & Decrements A/B into X\\ \hline
+        AND & X & A & B    & yes & 1000 & Binary AND A and B into X\\ \hline
+        ORA & X & A & B    & yes & 1001 & Binary OR A and B into X\\ \hline
+        NOT & X & A &      & yes & 1010 & Binary NOT A/B into X\\ \hline
+        BSL & X & A & or B & yes & 1011 & Bit-shift-left A/B into X\\ \hline
+        BSR & X & A & or B & yes & 1100 & Bit-shift-right A/B into X\\ \hline
+        JMP &   & A & or B & no  & 1101 & Jumps to instruction A/B\\ \hline
+        JIN &   & A & or B & no  & 1110 & Jumps to instruction A/B if negative flag\\ \hline
+        JIZ &   & A & or B & no  & 1111 & Jumps to instruction A/B if zero flag\\ \hline
+    \end{tabular}}
+\end{table}
+
+\subsection{Instruction Set Architecture}
+The way the executing part of the CPU interacts with memory is the defining feature of different Instruction Set Architecture Classes, and is closely linked to the CPU Architecture, as discussed in Section \ref{ssec::Architecture}. Figure \ref{fig::ISA} shows a simple diagram of the four main architecture classes. The stack and accumulator classes both involve implicit operands, i.e. operands that are used without the need to be specified. An operand is part of an expression, like a value or a register containing a value or acting as a destination for the result. The stack's operands are the two operands on top of the stack (TOS), while the accumulator holds one operand implicitly and the second operand is taken explicitly from the instruction. The usage of implicit operands limits the flexibility of the program, especially in a stack format, since expressions must be evaluated in one specific order, as the stack can only hold values in one order. The other two architecture classes make use of general purpose registers (GPR). This means none of the operands are implicitly given and their use must always be stated explicitly. The difference between register-register and register-memory classes is the relationship to memory: register-register architecture only allows registers as operands, which need to be loaded into registers and stored into memory separately and is thus often referred to as load-store architecture, while register-memory architecture takes one of its operands directly from memory, just as the accumulator class, while still specifying which register to choose the first operand from. The usage of GPR allows for easier storing of variables and reserving certain registers for expression evaluation, meaning e.g. expressions can be evaluated in any desired order. Another distinction between GPR architectures is the maximum number of allowed operands: a three-operand format uses one result register and two source registers, while the two-operand format uses one of the two operands as both source and result register. For this project, the load-store architecture class with a three-operand format was chosen, due to the ease of implementation, not needing an additional interface with memory for one of the operands during an operation and highest amount of flexibility of the different classes. Another advantage of load-store architecture is a fixed-length instruction, which was very important for the hardware implementation so that the modified Harvard architecture, as discussed in section \ref{ssec::Architecture}, could be followed. This choice does however increase the complexity of a compiler, since there isn't a simple step-by-step approach as with, for example, the stack architecture, where each expression uses a predictable series of pushes and pops. Unlike the GPR classes, stack architecture is not very code dense. A compiler for register architecture classes needs to keep track of what register is reserved for what purpose and holds what information. The modern approach to instruction set architecture classes is the load-store method, as is used in ARM, SPARC and RISC-V architectures, precisely because of the high flexibility it allows.
+
+\begin{figure}[ht]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{Figures/ISA.png}
+        \caption[Instruction Set Architecture Classes]{Instruction Set Architecture Classes, Source \cite[Figure A.1]{Computer_Architecture}. Both in (A) and (D), the operands can only be transferred to Registers/stack via separate instructions: push and pop for (A) and load/store for (D). (B) and (C) interface with memory directly to perform ALU operations.}
+        \label{fig::ISA}
+    \end{center}
+\end{figure}
+
+\subsection{Addressing Modes}
+\begin{table}[bp!]
+    \caption[Addressing modes]{A selection of four basic, common addressing modes}
+    \label{tab::AddressingModes}
+    \begin{center}
+        \begin{tabular}{lll}
+            Addressing mode & Example Instruction & Meaning \\ \hline
+            Register & ADD 0r3 0r2 0r 1 & Regs[3] $\leftarrow$ Regs[2] + Regs[1]\\ \hline
+            Immediate & LDA 0r2 0d42 & Regs[2] $\leftarrow$ 42\\ \hline
+            Register Indirect & LDA 0r2 0r4 & Regs[2] $\leftarrow$ Mem[Regs[4]] \\ \hline
+            Memory Indirect & LDA 0r2 0r4 & Regs[2] $\leftarrow$ Mem[Mem[Regs[4]]]\\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+Memory addressing covers the way in which the operands in a given instruction are interpreted. There is a variety of different ways an operand can be used to get the desired address or value, four of which are shown in Figure \ref{tab::AddressingModes}. The two most basic addressing modes are Register and Immediate mode, which are also the only two used in this project. Register mode takes in all the operands as register addresses, where the values inside the registers are used for the operation. Immediate mode takes in one immediate (here an 8-bit value) and a register to be used for the operation. These two modes allow for simple use and implementation, but they do bottleneck the programmer in some scenarios. Say, for example, one wants to calculate a simple addition, then store it in memory and later on retrieve this value. Values can easily be stored into registers in the form of an immediate using the LDA command, where the result register and the value are specified using the Immediate addressing mode. Calculations are done using register mode in the three-operand format, specifying one result and two sources. Storing the value in memory uses the Immediate format once again to specify the result address in memory as the immediate and the source register. But retrieving any stored value using only register or immediate mode isn't much of a possibility without workarounds. In fact, the storing only works because of a workaround, where the register and memory addresses are swapped in the instruction to accommodate their different sizes. Ideally, both the store and load instruction should use the register indirect or even memory indirect modes in order to facilitate more flexibility for a program. It is still theoretically possible to store and retrieve values, despite the implementation, but it would require the program to reprogram its own load/store instruction with the new value, i.e. changing e.g. \textbf{LDA 0r2 0d42} to \textbf{LDA 0r2 0d64}, instead of pointing to the stored value in memory.
+
+\subsection{Encoding the Instruction Set}
+Finally, the instruction set must be encoded into at most 16 bits, or two bytes, so that each instruction can be stored in two memory units. This maximum value allows for any instruction to be executed in one clock cycle and is still compact enough to be practical. Two arrangements of how to divide up the 16 bits are displayed in Figure \ref{fig::InstructionEncoding}, and they depend on which operand format is chosen. A three-operand format requires the 16 bits to be divided up equally, with four bits for each operand and the opcode, while a two-operand format allows some extra flexibility for the length of the opcode and thus allow for more instructions or even make multiple instruction addressing modes for each instruction possible. Ultimately, the first variant was chosen to facilitate a three-operand format since, at the time, it seemed to make the most sense. In hindsight, the two-operand format, in addition to using the register indirect addressing mode as part of the possible choices, would have been the smarter choice, but since an earlier prototype of this CPU was already using the first encoding, that choice stuck for the project. The layout of where each operand is encoded is also a remnant of the previous prototype and is addressed in more detail in section \ref{ssec::InstructionLayout}. The limit of 4 bits for the instruction means there can be at most 15 instructions. The opcode "0000" was ignored to get rid of an edge case that may have required an additional workaround. Each instruction has its addressing mode hardwired, where load and store use the Immediate and the other 13 instructions use the Register addressing mode. This limitation has a significant effect on the flexibility when programming, but does reduce the complexity for the assembler (section \ref{ssec::Assembler}) slightly, since it doesn't have to consider different addressing modes for the same instruction.
+
+\begin{figure}[h!]
+    \begin{center}
+        \begin{tikzpicture}
+            \draw (0,0.2) rectangle (1.5,0.7) node [midway] {2};
+            \draw (1.5,0.2) rectangle (3,0.7) node [midway] {2};
+            \draw (3,0.2) rectangle (4.5,0.7) node [midway] {2};
+            \draw (4.5,0.2) rectangle (6,0.7) node [midway] {2};
+            \draw (6,0.2) rectangle (7.5,0.7) node [midway] {2};
+            \draw (7.5,0.2) rectangle (9,0.7) node [midway] {2};
+            \draw (9,0.2) rectangle (10.5,0.7) node [midway] {2};
+            \draw (10.5,0.2) rectangle (12,0.7) node [midway] {2};
+            \draw (0,0) rectangle (3,-0.5) node [midway] {A};
+            \draw (3,0) rectangle (6,-0.5) node [midway] {Opcode};
+            \draw (6,0) rectangle (9,-0.5) node [midway] {B};
+            \draw (9,0) rectangle (12,-0.5) node [midway] {Result};
+            \draw (0,-0.7) rectangle (4.5,-1.2) node [midway] {Opcode};
+            \draw (4.5,-0.7) rectangle (7.5,-1.2) node [midway] {A};
+            \draw (7.5,-0.7) rectangle (10.5,-1.2) node [midway] {B};
+            \fill[black] (10.5,-0.7) rectangle (12,-1.2);
+        \end{tikzpicture}
+        \caption[Instruction Encoding]{Two possible instruction encodings using 16 bits. The top row shows the length for 2 bits. The middle row displays the layout for the three-operand format and the bottom row displays the two-operand format}
+        \label{fig::InstructionEncoding}
+    \end{center}
+\end{figure}
+
+\section{User Interface}
+Aside from flying into the CPU itself and examining it or manually, carefully powering redstone lines there is no way to get or set any data from memory. To program the CPU and execute a program, a User Interface (UI) is required. Since the UI is usually not a very intrusive construction, it doesn't affect the function of the CPU and can thus be added on to without needing to consider every other component of the CPU. The implemented UI consists of three levels, each level up decreasing the amount of work for the user. The first level is a direct connection to the memory and clock of the CPU, while the second and third level use external python programs and are purely quality of life features but make the process of creating and writing programs significantly easier.
+
+\subsection{Control Panel}
+\begin{figure}[hb!]
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{Figures/ControlPanel.png}
+        \caption[Control Panel]{Control Panel (left to right): output, I/O toggle, Reset PC, PULSE UPDATE, Clock, Address, Input}
+        \label{fig::ControlPanel}
+    \end{center}
+\end{figure}
+The control panel gives the user a lot of direct control. The biggest area is taken up by the input and output signals while a relatively small area is for some buttons and levers to control various features. The input module consists of an 8-bit address and an 8-bit value, clearly visible on the right wall in Figure \ref{fig::ControlPanel}. Each individual bit can be toggled on or off by hand while the current state of the input is displayed using redstone lamps. The values are connected directly to the RAM module and, with the push of the PULSE UPDATE button, are written to the specified address. The PULSE UPDATE button (in magenta) enables the address signal for a brief moment, allowing the address to be sent into the RAM and write the given data. This part uncovered a fairly significant issue with the timing for when the address lines arrive in each memory unit. Mainly, since the memory unit at address zero would always read zero while no address is present, an additional signal gets sent to that unit to deactivate the decoder until the write pulse arrives, and this signal needs to arrive at precisely the correct time due to the very short amount of time that the address gets sent through memory. This should merely be a matter of counting the redstone ticks for the signals to arrive, but it took an unreasonable amount of time to fix. As a sidenote, during testing larger programs it turned out that somehow quite a few connections were severed, i.e. a single block was missing, and thus some data never got written into memory or read out of memory. Some of these connections again took a large amount of time to discover, which happened mostly when a program began showing nonsensical values. The output module uses the same address bar as the input, but doesn't require any update button. The address feeds into the same line as the PC, so during execution each instruction is shown on the output panel. When reading specific addresses, the PC can be reset to not interfere with the address. Then there is an I/O On or Off lever (in gray) which can disable the input and address, a Reset PC button (in light blue) that sets the program counter to zero and the clock interface where the clock can be turned on or off to cycle continuously or where, by press of a button, the clock can cycle only once (in orange). These lines require little to no additional logic and connect directly to their respective component.
+
+\subsection{Disc Reader}
+\begin{figure}[bp!]
+    \begin{center}
+        \includegraphics[width=0.48\textwidth]{Figures/DiscReader-small.png}
+        \includegraphics[width=0.48\textwidth]{Figures/DiscReaderUnit.png}
+        \caption{Disc Reader}
+        \label{fig::DiscReader}
+    \end{center}
+\end{figure}
+Minecraft has another form of data storage neatly implemented though hidden in plain sight: Music discs and chests. Up until recently, this idea would have been complete nonsense, but in the 1.20 update in the summer of 2023, two technically small changes were made. First, each music disc, of which there are slightly more than 15 different versions, outputs a redstone signal with a strength readable by a comparator when it's playing inside a jukebox. Second, jukeboxes can be interacted with by redstone components, namely droppers to insert and hoppers to remove the music disc. This way, a series of music discs can be stored in a chest, or shulker box, which is a chest that can be placed and broken with redstone components, and continuously fed into a jukebox and their respective signal strength read out. Since the signal strengths range between 1 and 15, they encode hexadecimal values and can be decoded into their binary representation in four bits. A zero, which has no music disc, is represented by a stick and is filtered out right before it is pushed into the jukebox, decoding into nothing and thus a zero. Four music discs can therefore be used to store one byte of memory and its address and eight discs make up one full instruction. The decoder works by iteratively checking if each digit fits into the strength of the disc. First the value of 8 is checked to fit, then the value of 4, then 2 and finally 1, while each fitting value is subtracted from the value before the next check. Figure \ref{fig::DiscReader} \space shows the decoder units in blue. The full disc reader is built up of four such decoders, plus an unloading station for the shulker boxes (in white) and a clock (in gray) that sends both the PULSE UPDATE signal, the same one as in the control panel, and the signal to decode the next music disc (in orange in the back). There are command blocks, the purple out of place looking blocks below each unloading station, in this module which would and should be viewed very critically in a contraption that is meant to use the tools given to the regular player to achieve a certain goal. Command blocks are very powerful and can single-handedly do nearly anything, being an interface for commands and scripts. However, their purpose in this case is to delete the music discs and sticks as soon as possible to not create any clutter or unnecessary build up of items in a very compact and easy manner.
+
+\subsection{Assembler} \label{ssec::Assembler}
+\begin{figure}[bp!]
+    \lstinputlisting[language=Python]{Code/ParserSnippet.txt}
+    \caption[Parser code snippet]{A code snippet from the Parser}
+    \label{fig::ParserSnippet}
+\end{figure}
+The assembler provides the user with a tool to take an assembly style program and convert it into machine code, i.e. the ones and zeros that the CPU works with. Assembly is the lowest level programming language because it is an almost direct translation of machine code which makes it comparatively easy to convert into machine code rather than a more abstracted language, even a simple one. The assembler processes the code in two steps: tokenizing and parsing. The tokenizer iterates through every character, stores each white-space separated string as a token and automatically determines the type of the token, i.e. an instruction, a register or a decimal/immediate. Additionally, the tokenizer will recognize comments denoted by a "\#" and ignore the rest of that line. Assembly being such a low level language, each line can be evaluated completely in isolation of the other lines (There are certain features that would require the evaluation to keep track of some values, mainly for the branch instructions, but these features are not implemented yet). Once each instruction is tokenized, the parser begins iterating through each line. From this point on, each instruction group has a slightly different way of being parsed, but, in essence, each is the same. Each instruction has an entry in a dictionary and is mapped to a unique instruction code. The arguments are then encoded from decimal to binary and are  checked if they are in the correct position, i.e. all even registers map to A and all odd registers map to B. Each line also gets two addresses as a prefix, for each byte of the instruction, for where in memory the line is stored. This part is only necessary for the function of the next stage, but also helps to debug the program in memory. Figure \ref{fig::ParserSnippet} shows an excerpt of the parser for the instructions in the ALU group. Note that the code was slightly changed for readability and doesn't show the full picture. The full source code is available in the appendix.
+
+\subsection{Binary File to Minecraft}
+To load the disc reader, four chests are filled with shulker boxes containing music discs on their respective loading stations. To do this from an external program, a mod called Litematica is used. Litematica allows for the loading and placing of schematics, which can be thought of as a preview or template, and is most commonly used for builders to show them where to place what block. In this case, however, it is used only to place the four chests and their contents in the right spot. In python, the module \textit{mcschematic} provides the tools to easily create schematics. To place a certain block, the function \textit{setblock()}, along with the desired relative position of the block and the block itself, is used. Working with containers and especially containers inside containers is somewhat complex, and there are no easy-to-find guides on how this is works. Luckily, Minecraft provides the user with the ability to use the command \textit{F3 + I} to copy the setblock command for the block the player is looking at to the clipboard. From this, the structure of the block ID can be derived. Figure \ref{fig::minecraftChest} \space shows the block IDs from simple container blocks to containers in containers.
+\begin{figure}[h!]
+    \lstinputlisting[language=Python]{Code/BlockID.txt}
+    \caption{Block IDs for containers}
+    \label{fig::minecraftChest}
+\end{figure}
+
+Most of the program is responsible for iterating through the binary file and dealing with the necessary offsets and loops required to access the right bits in the binary file. The four bit binary strings are each converted to decimal values between 0 and 15 and then mapped to their corresponding music disc or stick. Finally, each item is inserted into the correct string format and then added to the list of items in the shulker boxes. The code is not very readable nor easy to understand, but it works exactly as intended and thus shouldn't be touched any further, abiding by the ancient law of \textit{If it ain't broke, don't fix it}.
