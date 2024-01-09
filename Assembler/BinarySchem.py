@@ -57,4 +57,4 @@ schem.setBlock((0, 9,0), "minecraft:chest{Items:[%s]}"%FillChest(0))
 schem.setBlock((0,18,0), "minecraft:chest{Items:[%s]}"%FillChest(5))
 schem.setBlock((0,27,0), "minecraft:chest{Items:[%s]}"%FillChest(4))
 
-schem.save( "myschems", "Binary%s" % title, mcschematic.Version.JE_1_20_2)
+schem.save( "myschems", "Binary%s" % title, mcschematic.Version.JE_1_19_2)
