@@ -13,10 +13,9 @@ ADDING THE WORLD TO MINECRAFT:
 USING THE ASSEMBLER:<br />
 Note: The current version is not very user-friendly and requires editing the code to change the file name
 1. Verify that the assembly code is in the folder called "Programs" in the same directory as the "assembler.py" file
-2. Open the "assembler.py" file in any text editor
-3. Locate the variable "fileName" and change its value to the name of the target file, without the suffix ".txt"
-4. Run the "assembler.py"
-5. The binary file should appear in the same "Programs" folder with the ".bin" suffix
+2. Run Assembler.exe
+3. Input the filename without the suffix (i.e. without .txt) and press ENTER
+4. The binary file should appear in the same "Programs" folder with the ".bin" suffix
 
 
 LOADING A PROGRAM INTO MEMORY FROM A BINARY FILE:<br />
@@ -24,21 +23,20 @@ Note: The current version is not very user-friendly and requires editing the cod
 Note: This program requires the python module "mcschematic" and python version 3.9.7, any other versions may not work<br />
 Note: To use the generated schematics, the mod "Litematica" (Video Guide: https://www.youtube.com/watch?v=KFzyNtyN8qI) is required<br />
 1. Verify that the binary file is in the folder called "Programs" in the same directory as the "assembler.py" file
-2. Open the "BinarySchem.py" file in any text editor
-3. Locate the variable "title" and change its value to the name of the target file, without the suffix ".bin"
-4. Run the "BinarySchem.py"
-5. The schematic file should appear in the "myschems" folder with the ".schem" suffix
-6. Locate the Minecraft directory as shown above and open the "schematics" folder 
-7. Move/copy the schematic file into the "schematic" folder and any subfolders as desired
-8. Locate the disc reader (tall, thin structure next to the control panel, the only structure using pistons, hoppers, droppers and command blocks)
-9. Load the schematic file and place the lowest chest on the lowest free hopper in the disc reader
-10. Right-click the lever at the bottom of the disc reader exactly once to arm the system
-11. Add a power source (typically a redstone block or a lever) behind the comparator on the gray concrete floor
-12. If using the "carpet" mod, feel free to set the tick rate to 200 (usually the highest it will actually run at) with "/tick rate 200"
-13. Wait for the redstone lamps at the output of the disc reader to stop changing and all be off
-14. The byte at location zero, i.e. 0b0 will be overridden to a value of zero and must be manually entered<br />
+2. Run BinarySchem.exe
+3. Input the filename without the suffix (i.e. without .bin) and press ENTER
+4. The schematic file should appear in the "myschems" folder with the ".schem" suffix
+5. Locate the Minecraft directory as shown above and open the "schematics" folder 
+6. Move/copy the schematic file into the "schematic" folder and any subfolders as desired
+7. Locate the disc reader (tall, thin structure next to the control panel, the only structure using pistons, hoppers, droppers and command blocks)
+8. Load the schematic file and place the lowest chest on the lowest free hopper in the disc reader
+9. Right-click the lever at the bottom of the disc reader exactly once to arm the system
+10. Add a power source (typically a redstone block or a lever) behind the comparator on the gray concrete floor
+11. If using the "carpet" mod, feel free to set the tick rate to 200 (usually the highest it will actually run at) with "/tick rate 200"
+12. Wait for the redstone lamps at the output of the disc reader to stop changing and all be off
+13. The byte at location zero, i.e. 0b0 will be overridden to a value of zero and must be manually entered<br />
     The value can be located in the ".bin" file as the third byte (two groups of four) in the first row
-15. Run the program from the control panel
+14. Run the program from the control panel
 
 
 USING THE CONTROL PANEL:<br />
