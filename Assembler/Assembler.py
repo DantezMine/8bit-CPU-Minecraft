@@ -33,6 +33,7 @@ class Token:
                 print("Error: Expected type character of either 'r' or 'd'")
                 return
 
+
 #Seperates each token by whitespace into a list, one list per line
 def Tokenizer():
     counter = 0
@@ -68,9 +69,9 @@ def Tokenizer():
         
     print("Tokenized correctly")
     return
-            
+          
+  
 def Parser():
-
     def IsEven(num):
         return num % 2 == 0
 
@@ -79,6 +80,7 @@ def Parser():
         INSTR, R, A, B = "----", "----", "----", "----"
         ADDR = f'{2*i:08b}'[0:4] + " " + f'{2*i:08b}'[4:8] + " " + f'{2*i+1:08b}'[0:4] + " " + f'{2*i+1:08b}'[4:8]
         
+        #Instr | Result | A | B
         def ALUFunc(R, A, B):
             if instr[1].type != "REGISTER" or instr[2].type != "REGISTER" or instr[3].type != "REGISTER":
                 print(f"{bcolors.FAIL}Error: On line %d, expected Register, Register, Register{bcolors.ENDC}" %(i+1))
@@ -94,7 +96,8 @@ def Parser():
             B = f'{valueB:08b}'[4:8]
             return (R, A, B)
         
-        def ALUFuncAlt(R, A, B):
+        #Instr | Result | A or B
+        def ALUAltFunc(R, A, B):
             if instr[1].type != "REGISTER" or instr[2].type != "REGISTER":
                 print(f"{bcolors.FAIL}Error: On line %d, expected Register, Register{bcolors.ENDC}" %(i+1))
                 return
@@ -104,6 +107,7 @@ def Parser():
             B = f'{value:08b}'[4:8] if not IsEven(value) else '0000'
             return (R, A, B)
         
+        #Instr | A or B
         def JMPFunc(R, A, B):
             if instr[1].type != "REGISTER":
                 print(f"{bcolors.FAIL}Error: On line %d, expected Register{bcolors.ENDC}" %(i+1))
@@ -114,6 +118,7 @@ def Parser():
             B = f'{value:08b}'[4:8] if not IsEven(value) else '0000'
             return (R, A, B)
 
+        #Instr | Result | Immediate or Label
         def LDAFunc(R, A, B):
             if instr[1].type != "REGISTER":
                 print(f"{bcolors.FAIL}Error: On line %d, expected Register{bcolors.ENDC}" %(i+1))
@@ -130,6 +135,7 @@ def Parser():
                 B = f'{labels[instr[2].str]*2:08b}'[0:4]
             return (R, A, B)
         
+        #Instr | Result as source | Immediate as address
         def STRFunc(R, A, B):
             if instr[1].type != "IMMEDIATE" or instr[2].type != "REGISTER":
                 print(f"{bcolors.FAIL}Error: On line %d, expected Immediate, Register{bcolors.ENDC}" %(i+1))
@@ -137,26 +143,27 @@ def Parser():
             A = f'{int(instr[1].str[2:]):08b}'[4:8]
             B = f'{int(instr[1].str[2:]):08b}'[0:4]
             return (R, A, B)
-    
+        
         instrMap = {"LDA":'0001',"STR":'0010',"MOV":'0011',"ADD":'0100',"SUB":'0101',"INC":'0110',"DEC":'0111',"AND":'1000',"ORA":'1001',"NOT":'1010',"BSL":'1011',"BSR":'1100',"JMP":'1101',"JIN":'1110',"JIZ":'1111'}
-        funcMap = {"LDA":LDAFunc,"STR":STRFunc,"MOV":ALUFuncAlt,"ADD":ALUFunc,"SUB":ALUFunc,"INC":ALUFuncAlt,"DEC":ALUFuncAlt,"AND":ALUFunc,"ORA":ALUFunc,"NOT":ALUFuncAlt,"BSL":ALUFuncAlt,"BSR":ALUFuncAlt,"JMP":JMPFunc,"JIN":JMPFunc,"JIZ":JMPFunc}
+        funcMap = {"LDA":LDAFunc,"STR":STRFunc,"MOV":ALUAltFunc,"ADD":ALUFunc,"SUB":ALUFunc,"INC":ALUAltFunc,"DEC":ALUAltFunc,"AND":ALUFunc,"ORA":ALUFunc,"NOT":ALUAltFunc,"BSL":ALUAltFunc,"BSR":ALUAltFunc,"JMP":JMPFunc,"JIN":JMPFunc,"JIZ":JMPFunc}
             
         if instr[0].type != "INSTRUCTION":
             print(f"{bcolors.FAIL}Error: On line %d, expected instruction{bcolors.ENDC}" %(i+1))
-            return
+            return -1
 
         if instr[0].str in instrMap:
             INSTR = instrMap[instr[0].str]
             R, A, B = funcMap[instr[0].str](R,A,B)
             if R is None or A is None or B is None:
-                return
+                return -1
 
         programBIN.write("%s %s %s %s %s\n" %(ADDR,A,INSTR,B,R))
     
     print("Parsed correctly")
-    return
+    return 0
 
-fileName = 'LogisticMap'
+#fileName = 'LogisticMap'
+fileName = input("Name of file (without suffix): ")
 
 programASM = open("Programs\\" + fileName + ".txt", "r")
 programBIN = open("Programs\\" + fileName + ".bin", "w")
@@ -164,8 +171,11 @@ programBIN = open("Programs\\" + fileName + ".bin", "w")
 instructions = list()
 labels = {}
 
-if Tokenizer() != -1:
-    Parser()
+if Tokenizer() == -1:
+    print("Tokenizer failed")
+else:
+    if Parser() == -1:
+        print("Parser failed")
 
 programASM.close()
 programBIN.close()
